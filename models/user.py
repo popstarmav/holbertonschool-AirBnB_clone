@@ -1,16 +1,12 @@
+#!/usr/bin/python3
+"""Defines the User class."""
 from models.base_model import BaseModel
 
 
 class User(BaseModel):
-    """User class to represent users."""
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.email = ""
-        self.password = ""
-        self.first_name = ""
-        self.last_name = ""
-
-    def __str__(self):
-        return "[{}] ({}) {} {}".format(
-            self.__class__.__name__, self.id, self.first_name, self.last_name
-        )
+    """Represents a User with email,
+    password, first_name, and last_name attributes."""
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""
