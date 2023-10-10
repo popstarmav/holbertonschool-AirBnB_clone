@@ -1,15 +1,9 @@
 #!/usr/bin/python3
+"""Defines the City class."""
 from models.base_model import BaseModel
 
 
 class City(BaseModel):
-    """City class to represent cities."""
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.state_id = ""
-        self.name = ""
-
-    def __str__(self):
-        return "[{}] ({}) {} - {}".format(
-                self.__class__.__name__, self.id, self.name, self.state_id
-        )
+    """Represents a city with state_id and name attributes."""
+    state_id = ""
+    name = ""
