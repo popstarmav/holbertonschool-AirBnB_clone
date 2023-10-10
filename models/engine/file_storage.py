@@ -34,7 +34,7 @@ class FileStorage:
         object_dict = {}
         for obj_key, obj_value in FileStorage.__objects.items():
             object_dict[obj_key] = obj_value.to_dict()
-        
+
         with open(FileStorage.__file_path, "w") as file:
             json.dump(object_dict, file)
 
