@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-"""Defines the HBnB console."""
 import cmd
 import re
-from shlex import split
 from models import storage
+from shlex import split
+from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -95,8 +95,9 @@ class HBNBCommand(cmd.Cmd):
         elif argl[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
         else:
-            print(eval(argl[0])().id)
-            storage.save()
+            new_instance = eval(argl[0])()
+            new_instance.save()
+            print(new_instance.id)
 
     def do_show(self, arg):
         """Display the string representation of a class instance of a given id.
@@ -190,11 +191,39 @@ class HBNBCommand(cmd.Cmd):
         if len(argl) == 2:
             print("** attribute name missing **")
             return False
-        if len(argl) == 3:
-            try:
-                type(eval(argl[2])) != dict
-            except NameError:
-                print("** value missing **")
-                return False
 
-        if len(argl) == 4:
+        # Handle the case of updating with a dictionary
+        if len(argl) == 3 and isinstance(eval(argl[2]), dict):
+            class_name, instance_id, attr_dict = argl
+            obj_key = "{}.{}".format(class_name, instance_id)
+
+            if obj_key in objdict:
+                obj = objdict[obj_key]
+                for key, value in attr_dict.items():
+                    # Check if obj has the specified attribute
+                    if hasattr(obj, key):
+                        # Use setattr to update the attribute
+                        setattr(obj, key, value)
+                obj.save()
+            else:
+                print("** no instance found **")
+        elif len(argl) == 4:
+            class_name, instance_id, attr_name, attr_value = argl
+            obj_key = "{}.{}".format(class_name, instance_id)
+
+            if obj_key in objdict:
+                obj = objdict[obj_key]
+                # Check if obj has the specified attribute
+                if hasattr(obj, attr_name):
+                    # Use setattr to update the attribute
+                    setattr(obj, attr_name, attr_value)
+                    obj.save()
+                else:
+                    print("** no attribute found **")
+            else:
+                print("** no instance found **")
+        else:
+            print("** value missing **")
+
+if __name__ == "__main__":
+    HBNBCommand().cmdloop()
