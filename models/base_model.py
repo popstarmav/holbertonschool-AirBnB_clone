@@ -1,27 +1,28 @@
 #!/usr/bin/python3
-import uuid
 from datetime import datetime
-from models import storage  # Import 'storage' here
+import json
+import models
+from uuid import uuid4
 
 class BaseModel:
     def __init__(self, *args, **kwargs):
+        self.id = str(uuid4())
+        self.created_at = self.updated_at = datetime.now()
         if kwargs:
             for key, value in kwargs.items():
                 if key == 'created_at' or key == 'updated_at':
-                    setattr(self, key, datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f'))
-                elif key != '__class__':
+                    value = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f')
+                if key != '__class__':
                     setattr(self, key, value)
         else:
-            self.id = str(uuid.uuid4())
-            self.created_at = self.updated_at = datetime.now()
+            models.storage.new(self)
 
     def __str__(self):
-        class_name = self.__class__.__name__
-        return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
+        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
 
     def save(self):
         self.updated_at = datetime.now()
-        storage.save(self)  # Call storage.save with the instance as an argument
+        models.storage.save()
 
     def to_dict(self):
         class_name = self.__class__.__name__
