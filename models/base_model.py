@@ -5,23 +5,19 @@ from datetime import datetime
 import json
 import models
 
-class BaseModel:
-    """Defines the BaseModel class."""
 
+class BaseModel:
     def __init__(self, *args, **kwargs):
-        """Initialize a new BaseModel instance."""
         if kwargs:
             for key, value in kwargs.items():
                 if key == 'created_at' or key == 'updated_at':
                     setattr(self, key, datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f'))
                 elif key != '__class__':
                     setattr(self, key, value)
-            self.id = str(uuid.uuid4())
-            self.created_at = self.updated_at = datetime.now()
         else:
             self.id = str(uuid.uuid4())
             self.created_at = self.updated_at = datetime.now()
-            models.storage.new(self)  # Add the new object to the storage
+            storage.new(self)
 
     def __str__(self):
         """Return a string representation of the BaseModel instance."""
@@ -68,6 +64,10 @@ class FileStorage:
                     FileStorage.__objects[key] = obj
         except FileNotFoundError:
             pass
+
+    def save(self):
+        self.updated_at = datetime.now()
+        storage.save()
 
 storage = FileStorage()
 storage.reload()
